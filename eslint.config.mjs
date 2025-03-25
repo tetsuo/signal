@@ -8,7 +8,10 @@ export default [
     files: ['src/**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: 'module'
+      sourceType: 'module',
+      globals: {
+        queueMicrotask: true
+      }
     },
     plugins: {
       prettier: prettierPlugin
