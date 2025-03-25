@@ -5,7 +5,7 @@ export default [
   js.configs.recommended, // base JS rules
 
   {
-    files: ['**/*.js'],
+    files: ['src/**/*.js'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module'

@@ -4,9 +4,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "lint": "eslint ./",
-    "prettier": "prettier --list-different \"*.js\"",
-    "fix-prettier": "prettier --write \"*.js\"",
+    "lint": "eslint src",
+    "prettier": "prettier --list-different \"src/**/*.js\"",
+    "fix-prettier": "prettier --write \"src/**/*.js\"",
     "test": "vitest --run",
     "cover": "vitest --run --coverage"
   },
