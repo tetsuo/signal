@@ -1,26 +1,41 @@
 {
   "name": "@tetsuo/signal",
-  "version": "1.0.0",
-  "main": "index.js",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.es6.js",
   "type": "module",
   "scripts": {
+    "cjs-build": "rollup src/index.js --format cjs --file dist/index.js",
+    "es6-build": "rollup src/index.js --format es --file dist/index.es6.js && rollup src/index.js --format es --plugin terser --file dist/index.es6.min.js",
+    "build": "npm run cjs-build && npm run es6-build",
     "lint": "eslint src",
     "prettier": "prettier --list-different \"src/**/*.js\"",
     "fix-prettier": "prettier --write \"src/**/*.js\"",
-    "test": "vitest --run",
-    "cover": "vitest --run --coverage"
+    "test": "vitest run",
+    "cover": "vitest run --coverage"
   },
+  "exports": {
+    ".": {
+      "import": "./dist/index.es6.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "keywords": [],
   "author": "",
   "license": "MIT",
   "description": "",
   "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
     "@vitest/coverage-v8": "^3.0.9",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "jest": "^29.7.0",
     "prettier": "3.5.3",
+    "rollup": "^4.37.0",
     "vitest": "^3.0.9"
   }
 }
