@@ -70,7 +70,7 @@ graph.batch(() => {
 })
 ```
 
-## Async Flushing
+## Async flushing
 
 Schedule updates in a microtask instead of running immediately. A custom scheduler can also be provided:
 
@@ -86,4 +86,4 @@ new Graph({
 
 ## License
 
-MIT license.
+MIT license
