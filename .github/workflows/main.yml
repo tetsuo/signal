@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install modules
-        run: npm install
+        run: npm install && npm install --save-dev @rollup/rollup-linux-x64-gnu
 
       - name: Run tests
         run: npm run test-all
