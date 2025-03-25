@@ -2,7 +2,7 @@
   "name": "@tetsuo/signal",
   "version": "0.0.0",
   "private": true,
-  "main": "src/index.js",
+  "main": "./src/index.js",
   "type": "module",
   "scripts": {
     "cjs-build": "rimraf dist/index.cjs && rollup src/index.js --format cjs --file dist/index.cjs",
