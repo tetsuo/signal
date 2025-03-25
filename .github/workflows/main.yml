@@ -1,0 +1,126 @@
+name: build
+
+on: [pull_request, push]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.0.x]
+    steps:
+      - name: Set up NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Set up node modules cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.OS }}-node${{ matrix.node-version }}-build-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node${{ matrix.node-version }}-build-${{ env.cache-name }}-
+            ${{ runner.OS }}-node${{ matrix.node-version }}-build-
+            ${{ runner.OS }}-node${{ matrix.node-version }}-
+
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install modules
+        run: npm install
+
+      - name: Run tests
+        run: npm run test-all
+
+      - name: Build dist
+        run: npm run build
+
+      - name: Publish
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          next_version () {
+            local current
+            local impact
+            local MAJOR
+            local MINOR
+            local PATCH
+            local parts
+            impact="$1"
+            if [ -z "$1" ]
+            then
+              impact="patch"
+            fi
+            current=$(git tag | sort -r | grep "^[0-9]*\.[0-9]*\.[0-9]" | sort -t "." -k1,1nr -k2,2nr -k3,3nr | head -1 2> /dev/null) || true
+            if [[ -z "$current" ]]; then
+              current='0.0.0'
+            fi
+            parts=(${current//./ })
+            MAJOR=${parts[0]}
+            MINOR=${parts[1]}
+            PATCH=${parts[2]}
+            case "$impact" in
+              major)
+                ((MAJOR+=1))
+                ;;
+              minor)
+                ((MINOR+=1))
+                ;;
+              patch)
+                ((PATCH+=1))
+                ;;
+            esac
+            echo "$MAJOR.$MINOR.$PATCH"
+          }
+          tag_and_release () {
+            local commit
+            commit=$(git rev-parse HEAD)
+            local next
+            if [[ -z "$(git describe --contains "$commit" 2>/dev/null)" ]]; then
+              next="$(next_version "$1")"
+              npm version "$next"
+              npm publish --verbose
+              git tag "$next"
+              git config user.name github-actions
+              git config user.email github-actions@github.com
+              git push --tags
+            fi
+          }
+
+          cp -R README.md LICENSE dist
+
+          cat package.json | \
+            jq 'del(.devDependencies, .scripts, .private)' | \
+            jq '. + { "publishConfig": { "registry":"https://npm.pkg.github.com/" } }' \
+            > dist/metadata.json
+
+          cat <<EOF > dist/exports.json
+          {
+            "main": "index.cjs",
+            "module": "lib/index.js",
+            "exports": {
+              ".": {
+                "import": "lib/index.js",
+                "require": "index.cjs"
+              }
+            }
+          }
+          EOF
+
+          jq -s '.[0] * .[1]' dist/metadata.json dist/exports.json > dist/package.json
+
+          rm -fr dist/exports.json dist/metadata.json
+
+          touch dist/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=$GITHUB_TOKEN" > dist/.npmrc
+
+          git fetch --all --tags
+
+          (cd dist && tag_and_release patch)
+
+          rm -fr dist
