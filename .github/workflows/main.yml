@@ -102,13 +102,7 @@ jobs:
           cat <<EOF > dist/exports.json
           {
             "main": "./index.cjs",
-            "module": "./lib/index.js",
-            "exports": {
-              ".": {
-                "import": "./lib/index.js",
-                "require": "./index.cjs"
-              }
-            }
+            "module": "./lib/index.js"
           }
           EOF
 
