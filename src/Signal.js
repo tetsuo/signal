@@ -28,8 +28,12 @@ export default class Signal {
     this._value = newValue
     this._rev++
     if (this._observers.size > 0) {
-      // Batch the update notifications
-      this.graph.beginBatch()
+      // Only create a new batch if we're not already in one
+      const alreadyBatched = this.graph._batchDepth > 0
+      if (!alreadyBatched) {
+        this.graph.beginBatch()
+      }
+
       for (const obs of this._observers) {
         if (obs instanceof Computed) {
           // Mark dependent computed as dirty
@@ -39,7 +43,10 @@ export default class Signal {
           this.graph._scheduleReaction(obs)
         }
       }
-      this.graph.endBatch()
+
+      if (!alreadyBatched) {
+        this.graph.endBatch()
+      }
     }
   }
 
