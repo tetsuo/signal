@@ -45,12 +45,7 @@ export default class Graph {
       } else {
         // Sync flush: process all computations and reactions now
         this._flushDirtyComputeds()
-        for (const reaction of this._pendingReactions) {
-          this._pendingReactions.delete(reaction)
-          if (!reaction._isDisposed) {
-            reaction._run()
-          }
-        }
+        this._flushReactions()
       }
     }
   }
@@ -73,14 +68,23 @@ export default class Graph {
   }
 
   _scheduleReaction(reaction) {
-    // Queue a Reaction to run after the current batch completes
-    if (this._batchDepth > 0) {
-      this._pendingReactions.add(reaction)
-    } else {
-      // No batch active: start a mini-batch to schedule and run the reaction
-      this.beginBatch()
-      this._pendingReactions.add(reaction)
-      this.endBatch()
+    // Add to pending reactions
+    const wasEmpty = this._pendingReactions.size === 0
+    this._pendingReactions.add(reaction)
+
+    // If not in a batch and this is the first reaction added, flush now
+    if (this._batchDepth === 0 && wasEmpty) {
+      this._flushReactions()
+    }
+  }
+
+  _flushReactions() {
+    const reactionsToRun = Array.from(this._pendingReactions)
+    this._pendingReactions.clear()
+    for (const r of reactionsToRun) {
+      if (!r._isDisposed) {
+        r._run()
+      }
     }
   }
 
