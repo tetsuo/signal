@@ -132,7 +132,11 @@ export default class Computed {
     if (this._observers.size === 0) {
       // No observers left: suspend this computed to save work
       for (const dep of this._dependencies) {
-        dep._observers.delete(this)
+        if (dep instanceof Computed) {
+          dep._removeObserver(this)
+        } else {
+          dep._observers.delete(this)
+        }
       }
       this._isDirty = true // mark dirty so it'll recompute if accessed again
     }
@@ -140,7 +144,11 @@ export default class Computed {
 
   dispose() {
     for (const dep of this._dependencies) {
-      dep._observers.delete(this)
+      if (dep instanceof Computed) {
+        dep._removeObserver(this)
+      } else {
+        dep._observers.delete(this)
+      }
     }
     this._dependencies.clear()
     // Mark dirty to force a fresh computation if revived
