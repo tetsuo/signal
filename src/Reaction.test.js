@@ -201,4 +201,38 @@ describe('Reaction', () => {
     a.set(3)
     expect(outerCount).toBe(3)
   })
+
+  it('flushes cascading reactions in the same batch', () => {
+    const g = new Graph()
+    const s = g.signal(0)
+    const s2 = g.signal(0)
+
+    let r1Calls = 0
+    let r2Calls = 0
+
+    // Reaction 1: observes s, sets s2
+    g.reaction(() => {
+      r1Calls++
+      if (s.get() > 0) {
+        s2.set(s.get())
+      }
+    })
+
+    // Reaction 2: observes s2
+    g.reaction(() => {
+      r2Calls++
+      s2.get()
+    })
+
+    // Initial run
+    expect(r1Calls).toBe(1)
+    expect(r2Calls).toBe(1)
+
+    // Update s
+    s.set(1)
+
+    // s changes -> r1 runs -> sets s2 -> r2 runs
+    expect(r1Calls).toBe(2)
+    expect(r2Calls).toBe(2)
+  })
 })
