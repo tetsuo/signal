@@ -16,6 +16,9 @@ export default class Computed {
   }
 
   get() {
+    if (this._isComputing) {
+      throw new Error('Circular dependency in Computed')
+    }
     // Register as dependency if being accessed inside another derivation
     const node = this.graph._currentDerivation
     if (node && node.graph === this.graph) {
