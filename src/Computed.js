@@ -66,6 +66,21 @@ export default class Computed {
     this.graph._startTracking(this)
     try {
       this._value = this._computeFn()
+    } catch (e) {
+      if (!this._static) {
+        // Clean up any new dependencies collected during the failed run
+        for (const dep of this._dependencies) {
+          if (!oldDeps.has(dep)) {
+            if (dep instanceof Computed) {
+              dep._removeObserver(this)
+            } else {
+              dep._observers.delete(this)
+            }
+          }
+        }
+        this._dependencies = oldDeps
+      }
+      throw e
     } finally {
       this.graph._endTracking()
       this._isComputing = false
