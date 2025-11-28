@@ -102,4 +102,78 @@ describe('Graph', () => {
 
     expect(flushed).toEqual([1, 2])
   })
+
+  it('skips async flush if new batch started before flush runs', async () => {
+    let scheduledFn
+    const g = new Graph({
+      asyncFlush: true,
+      scheduler: cb => {
+        scheduledFn = cb
+      }
+    })
+
+    const s = g.signal(1)
+    const log = []
+
+    g.reaction(() => {
+      log.push(s.get())
+    })
+
+    expect(log).toEqual([1])
+
+    // Trigger update; schedules async flush
+    s.set(2)
+    expect(log).toEqual([1])
+
+    // Start a new batch BEFORE the scheduled flush runs
+    g.beginBatch()
+
+    // Now run the scheduled flush; should skip because we're in a batch
+    scheduledFn()
+
+    expect(log).toEqual([1]) // still not flushed
+
+    // End the batch; now it should flush
+    g.endBatch()
+
+    // Run the newly scheduled flush
+    scheduledFn()
+
+    expect(log).toEqual([1, 2])
+  })
+
+  it('throws error when max computed flush iterations exceeded', () => {
+    const g = new Graph()
+    const s = g.signal(0)
+
+    // Create two computeds that mark each other dirty in a loop
+    // c1 recomputes -> marks c2 dirty -> c2 recomputes -> marks c1 dirty -> ...
+    let c1, c2
+
+    c1 = g.computed(() => {
+      const val = s.get()
+      if (c2 && c2._observers.size > 0) {
+        c2._isDirty = true
+        g._dirtyComputeds.add(c2)
+      }
+      return val
+    })
+
+    c2 = g.computed(() => {
+      const val = c1.get()
+      if (c1._observers.size > 0) {
+        c1._isDirty = true
+        g._dirtyComputeds.add(c1)
+      }
+      return val
+    })
+
+    // Set up observer so both computeds stay active
+    g.reaction(() => c2.get())
+
+    // This should eventually throw due to c1 <-> c2 ping-pong
+    expect(() => {
+      s.set(1)
+    }).toThrow('Maximum computed flush iterations exceeded')
+  })
 })

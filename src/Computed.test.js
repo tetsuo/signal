@@ -278,4 +278,147 @@ describe('Computed', () => {
     c.dispose()
     expect(log).toEqual([2, 2]) // reaction re-runs because it depended on c
   })
+
+  it('cleans up new dependencies when compute function throws', () => {
+    const g = new Graph()
+    const s1 = g.signal(1)
+    const s2 = g.signal(2)
+    let shouldThrow = false
+
+    const c = g.computed(() => {
+      const v1 = s1.get()
+      if (shouldThrow) {
+        s2.get() // new dependency added before throw
+        throw new Error('test error')
+      }
+      return v1
+    })
+
+    // First access works fine
+    expect(c.get()).toBe(1)
+    expect(c._dependencies.size).toBe(1) // only s1
+
+    // Now make it throw
+    shouldThrow = true
+    s1.set(2) // triggers recompute
+
+    expect(() => c.get()).toThrow('test error')
+    // Dependencies should be restored to previous state (only s1)
+    expect(c._dependencies.size).toBe(1)
+    expect(c._dependencies.has(s1)).toBe(true)
+    expect(c._dependencies.has(s2)).toBe(false)
+  })
+
+  it('cleans up Computed dependencies when compute function throws', () => {
+    const g = new Graph()
+    const s = g.signal(1)
+    const inner = g.computed(() => s.get() * 2)
+    let shouldThrow = false
+
+    const outer = g.computed(() => {
+      if (shouldThrow) {
+        inner.get() // new Computed dependency added before throw
+        throw new Error('test error')
+      }
+      return s.get()
+    })
+
+    // First access works fine, depends only on s
+    expect(outer.get()).toBe(1)
+
+    // Now make it throw
+    shouldThrow = true
+    s.set(2)
+
+    expect(() => outer.get()).toThrow('test error')
+    // inner should not have outer as observer
+    expect(inner._observers.has(outer)).toBe(false)
+  })
+
+  it('removes Computed observer when Computed has no observers left', () => {
+    const g = new Graph()
+    const s = g.signal(1)
+    const inner = g.computed(() => s.get() * 2)
+    const outer = g.computed(() => inner.get() + 1)
+
+    // Access to establish dependencies
+    expect(outer.get()).toBe(3)
+    expect(inner._observers.has(outer)).toBe(true)
+
+    // Dispose outer; should remove itself from inner's observers
+    outer.dispose()
+    expect(inner._observers.has(outer)).toBe(false)
+  })
+
+  it('dispose removes Computed from Computed dependencies', () => {
+    const g = new Graph()
+    const s = g.signal(1)
+    const inner = g.computed(() => s.get() * 2)
+    const outer = g.computed(() => inner.get() + 1)
+
+    // Access to establish dependencies
+    expect(outer.get()).toBe(3)
+    expect(inner._observers.has(outer)).toBe(true)
+    expect(outer._dependencies.has(inner)).toBe(true)
+
+    // Dispose outer
+    outer.dispose()
+
+    // inner should no longer have outer as observer
+    expect(inner._observers.has(outer)).toBe(false)
+  })
+
+  it('throws error on circular dependency during recompute', () => {
+    const g = new Graph()
+
+    // Create a computed that depends on itself via getting its own value
+    let c
+    c = g.computed(() => {
+      // Try to access self - this creates a circular dependency
+      return c ? c.get() + 1 : 0
+    })
+
+    // First access triggers the circular dependency error
+    expect(() => c.get()).toThrow('Circular dependency in Computed')
+  })
+
+  it('throws error when _recompute called while already computing', () => {
+    const g = new Graph()
+    const s = g.signal(1)
+
+    let recomputeRef
+    const c = g.computed(() => {
+      recomputeRef = c._recompute.bind(c)
+      // Call _recompute directly while already computing - bypasses get() check
+      if (c._isComputing) {
+        c._recompute()
+      }
+      return s.get()
+    })
+
+    // First access; during compute, _isComputing is true, then we call _recompute
+    // The _recompute check should catch this
+    expect(() => c.get()).toThrow('Circular dependency in Computed')
+  })
+
+  it('removes Computed from Computed dependency when observer removed', () => {
+    const g = new Graph()
+    const s = g.signal(1)
+    const inner = g.computed(() => s.get() * 2)
+    const outer = g.computed(() => inner.get() + 1)
+
+    // Set up a reaction to observe outer
+    const r = g.reaction(() => outer.get())
+
+    // Verify chain: s -> inner -> outer -> r
+    expect(inner._observers.has(outer)).toBe(true)
+    expect(outer._observers.has(r)).toBe(true)
+
+    // Dispose reaction; outer loses its only observer
+    // This should trigger _removeObserver chain: outer removes itself from inner
+    r.dispose()
+
+    // outer should have removed itself from inner's observers
+    expect(inner._observers.has(outer)).toBe(false)
+  })
 })

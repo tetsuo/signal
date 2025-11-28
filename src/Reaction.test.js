@@ -235,4 +235,38 @@ describe('Reaction', () => {
     expect(r1Calls).toBe(2)
     expect(r2Calls).toBe(2)
   })
+
+  it('prevents recursive execution via _isRunning guard', () => {
+    const g = new Graph()
+    const s = g.signal(1)
+    let runCount = 0
+    let reactionRef = null
+
+    const r = g.reaction(() => {
+      runCount++
+      s.get()
+      // Attempt to trigger self by calling _run directly
+      // This simulates what could happen if we got re-queued during execution
+      // Only try after first run when reactionRef is set
+      if (runCount === 2 && reactionRef) {
+        reactionRef._run()
+      }
+    })
+
+    reactionRef = r
+
+    // Initial run
+    expect(runCount).toBe(1)
+
+    // This will cause runCount to be 2, and inside it tries r._run()
+    // But _isRunning guard should prevent it from running again
+    s.set(2)
+
+    // Should be 2, not 3 - the recursive _run() was blocked
+    expect(runCount).toBe(2)
+
+    // External trigger should still work
+    s.set(3)
+    expect(runCount).toBe(3)
+  })
 })
