@@ -84,6 +84,59 @@ new Graph({
 })
 ```
 
+## Observer
+
+Base class for building reactive components. Useful for background watchers or coordinating children.
+
+```js
+import { Observer } from '@tetsuo/signal'
+
+class StockWatcher extends Observer {
+  constructor(graph, inventory) {
+    super(graph)
+    this.inventory = inventory
+
+    this.observe(() => {
+      const lowStock = this.inventory.lowStockProducts.get()
+      // React to stock changes...
+    })
+  }
+}
+```
+
+## View
+
+Extends `Observer` with DOM rendering capabilities. Uses template cloning.
+
+```js
+import { View } from '@tetsuo/signal'
+
+class ProductList extends View {
+  constructor(graph, products) {
+    super(graph, {
+      elementId: 'product-list',
+      templateId: 'product-template'
+    })
+    this.products = products
+
+    this.onClick('.add-btn', (e, el) => {
+      const id = el.closest('.product').dataset.id
+      // Handle click...
+    })
+
+    this.observe(() => this.render())
+  }
+
+  render() {
+    this.renderList(this.products.get(), (product, el) => {
+      el.dataset.id = product.id
+      this.setText(el, '.name', product.name)
+      this.setText(el, '.price', product.price)
+    })
+  }
+}
+```
+
 ## License
 
 MIT license
