@@ -280,3 +280,9 @@ function escapeHtml(text) {
   div.textContent = text
   return div.innerHTML
 }
+
+// Demo: Add some initial todos
+addTodo('Buy milk')
+addTodo('Write documentation')
+addTodo('Walk the dog')
+toggleTodo(3)
