@@ -61,11 +61,7 @@ function addTodo(title) {
 }
 
 function toggleTodo(id) {
-  todos.set(
-    todos.get().map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    )
-  )
+  todos.set(todos.get().map(todo => (todo.id === id ? { ...todo, completed: !todo.completed } : todo)))
 }
 
 function destroyTodo(id) {
@@ -81,18 +77,12 @@ function editTodo(id, newTitle) {
     return
   }
 
-  todos.set(
-    todos.get().map(todo =>
-      todo.id === id ? { ...todo, title: trimmed } : todo
-    )
-  )
+  todos.set(todos.get().map(todo => (todo.id === id ? { ...todo, title: trimmed } : todo)))
 }
 
 function toggleAll() {
   const shouldComplete = !allCompleted.get()
-  todos.set(
-    todos.get().map(todo => ({ ...todo, completed: shouldComplete }))
-  )
+  todos.set(todos.get().map(todo => ({ ...todo, completed: shouldComplete })))
 }
 
 function clearCompleted() {
@@ -170,7 +160,7 @@ g.reaction(() => {
       }
     })
 
-    editInput.addEventListener('keydown', (e) => {
+    editInput.addEventListener('keydown', e => {
       if (e.key === 'Enter') {
         editTodo(todo.id, editInput.value)
         editingId.set(null)
@@ -237,7 +227,7 @@ g.reaction(() => {
 })
 
 // Event: Add new todo
-newTodoInput.addEventListener('keydown', (e) => {
+newTodoInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     addTodo(newTodoInput.value)
     newTodoInput.value = ''
@@ -252,7 +242,7 @@ clearCompletedBtn.addEventListener('click', clearCompleted)
 
 // Event: Filter navigation
 filterLinks.forEach(link => {
-  link.addEventListener('click', (e) => {
+  link.addEventListener('click', e => {
     e.preventDefault()
     const href = link.getAttribute('href')
 
@@ -290,9 +280,3 @@ function escapeHtml(text) {
   div.textContent = text
   return div.innerHTML
 }
-
-// Demo: Add some initial todos
-addTodo('Buy milk')
-addTodo('Write documentation')
-addTodo('Walk the dog')
-toggleTodo(3)
