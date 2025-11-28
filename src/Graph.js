@@ -32,6 +32,10 @@ export default class Graph {
           this._flushScheduled = true
           this._scheduler(() => {
             this._flushScheduled = false
+            // Skip flush if we're in a new batch (will be flushed when batch ends)
+            if (this._batchDepth > 0) {
+              return
+            }
             this._flushDirtyComputeds()
             // Run all queued side effects after computed values are updated
             for (const reaction of this._pendingReactions) {
