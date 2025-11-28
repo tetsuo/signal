@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fruit shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="fruitshop.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Templates -->
+
+  <template id="product-template">
+    <div class="product" data-id="">
+      <div class="product-badge"></div>
+      <div class="product-name"></div>
+      <div class="product-price"></div>
+      <div class="product-stock"></div>
+      <button class="button-74 add-btn" role="button">add to cart</button>
+    </div>
+  </template>
+
+  <template id="cart-item-template">
+    <div class="cart-item">
+      <div class="cart-item-info">
+        <div class="cart-item-name"></div>
+        <div class="cart-item-price"></div>
+      </div>
+      <div class="cart-controls">
+        <button class="qty-btn minus button-74" data-action="decrement">−</button>
+        <span class="qty"></span>
+        <button class="qty-btn plus button-74" data-action="increment">+</button>
+        <button class="remove-btn button-74" data-action="remove">×</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="empty-cart-template">
+    <div class="empty-cart">Your cart is empty</div>
+  </template>
+
+  <template id="promo-banner-template">
+    <div class="promo-banner"></div>
+  </template>
+
+  <template id="empty-state-template">
+    <div class="empty-state"></div>
+  </template>
+
+  <template id="activity-item-template">
+    <div class="activity-item">
+      <div class="activity-message"></div>
+      <div class="activity-time"></div>
+    </div>
+  </template>
+
+  <template id="analytics-item-template">
+    <div class="analytics-item">
+      <div class="analytics-value"></div>
+      <div class="analytics-label"></div>
+    </div>
+  </template>
+
+  <template id="cart-summary-template">
+    <div class="summary-row">
+      <span>Subtotal:</span>
+      <span class="subtotal-value"></span>
+    </div>
+    <div class="summary-row discount">
+      <span class="discount-label"></span>
+      <span class="discount-value"></span>
+    </div>
+    <div class="summary-row">
+      <span>Tax (10%):</span>
+      <span class="tax-value"></span>
+    </div>
+    <div class="summary-row total">
+      <span>Total:</span>
+      <span class="total-value"></span>
+    </div>
+    <div class="summary-row" style="color: #289b45; font-size: 14px; margin-top: 8px;">
+      <span>Points to earn:</span>
+      <span class="points-value"></span>
+    </div>
+    <button class="button-74 checkout-btn">
+      checkout
+    </button>
+  </template>
+
+  <header>
+    <div class="container">
+      <h1>🍐🍋🍋‍🟩🥝🍒🍊 <span style="color: #5f0089;">fruit</span><span style="color: #8100ff;">shop</span></h1>
+      <p><a href="https://github.com/tetsuo/signal">Source</a> ❤️ Built with <a href="https://github.com/tetsuo/signal">signal</a></p>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="layout">
+      <!-- Left Column -->
+      <div>
+        <!-- User info -->
+        <div class="card">
+          <h2>Customer profile</h2>
+          <div>
+            <div class="user-info">
+              <div>
+                <div><strong id="user-name"></strong></div>
+                <div style="color: #666; font-size: 14px;" id="user-email"></div>
+              </div>
+              <span id="user-level" class="user-level"></span>
+            </div>
+            <div class="stats">
+              <div class="stat">
+                <div class="stat-value" id="stat-orders">0</div>
+                <div class="stat-label">Orders</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value" id="stat-spent">€0</div>
+                <div class="stat-label">Total spent</div>
+              </div>
+              <div class="stat">
+                <div class="stat-value" id="stat-points">0</div>
+                <div class="stat-label">Points</div>
+              </div>
+            </div>
+            <div id="promo-container"></div>
+          </div>
+        </div>
+        <div style="margin-top: 20px" class="products-grid" id="products-grid"></div>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <!-- Shopping cart -->
+        <div class="card">
+          <h2>Cart</h2>
+          <div>
+            <div id="cart-items"></div>
+            <div id="cart-summary" class="summary-table"></div>
+          </div>
+        </div>
+
+        <!-- Analytics -->
+        <div class="card" style="margin-top: 20px;">
+          <h2>Store analytics</h2>
+          <div class="analytics-grid" id="analytics-grid"></div>
+        </div>
+
+        <!-- Activity -->
+        <div class="card" style="margin-top: 20px;">
+          <h2>Activity</h2>
+          <div class="activity-log" id="activity-log"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
