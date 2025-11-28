@@ -96,6 +96,8 @@ export default class Graph {
   }
 
   _flushReactions() {
+    // Always flush dirty computeds first for consistent state
+    this._flushDirtyComputeds()
     const reactionsToRun = Array.from(this._pendingReactions)
     this._pendingReactions.clear()
     for (const r of reactionsToRun) {
