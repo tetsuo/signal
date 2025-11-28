@@ -58,7 +58,14 @@ export default class Graph {
 
   _flushDirtyComputeds() {
     // Recompute all dirty Computed values in topological order; lower depth first
+    // Safety limit to prevent infinite loops from circular dependencies
+    let iterations = 0
+    const maxIterations = 1000
     while (this._dirtyComputeds.size) {
+      if (++iterations > maxIterations) {
+        this._dirtyComputeds.clear()
+        throw new Error('Maximum computed flush iterations exceeded - possible circular dependency')
+      }
       const toRecompute = Array.from(this._dirtyComputeds)
       this._dirtyComputeds.clear()
       // Sort by depth to ensure dependencies are evaluated before dependents
@@ -74,6 +81,10 @@ export default class Graph {
   }
 
   _scheduleReaction(reaction) {
+    // Don't schedule a reaction that's currently running to avoid infinite loops
+    if (reaction._isRunning) {
+      return
+    }
     // Add to pending reactions
     const wasEmpty = this._pendingReactions.size === 0
     this._pendingReactions.add(reaction)
