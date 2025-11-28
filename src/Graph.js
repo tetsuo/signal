@@ -38,8 +38,10 @@ export default class Graph {
             }
             this._flushDirtyComputeds()
             // Run all queued side effects after computed values are updated
-            for (const reaction of this._pendingReactions) {
-              this._pendingReactions.delete(reaction)
+            // Collect reactions first to avoid iterator invalidation
+            const reactionsToRun = Array.from(this._pendingReactions)
+            this._pendingReactions.clear()
+            for (const reaction of reactionsToRun) {
               if (!reaction._isDisposed) {
                 reaction._run()
               }
