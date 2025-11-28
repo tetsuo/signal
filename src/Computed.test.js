@@ -386,9 +386,7 @@ describe('Computed', () => {
     const g = new Graph()
     const s = g.signal(1)
 
-    let recomputeRef
     const c = g.computed(() => {
-      recomputeRef = c._recompute.bind(c)
       // Call _recompute directly while already computing - bypasses get() check
       if (c._isComputing) {
         c._recompute()
