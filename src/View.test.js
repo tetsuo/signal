@@ -1,35 +1,24 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { JSDOM } from 'jsdom'
+/**
+ * @vitest-environment jsdom
+ */
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import Graph from './Graph.js'
 import View from './View.js'
 
 describe('View', () => {
   let g
-  let dom
-  let document
 
   beforeEach(() => {
     g = new Graph()
-    dom = new JSDOM(`
-      <!DOCTYPE html>
-      <html>
-        <body>
-          <div id="app"></div>
-          <template id="item-template">
-            <div class="item">
-              <span class="name"></span>
-            </div>
-          </template>
-        </body>
-      </html>
-    `)
-    document = dom.window.document
-    global.document = document
+    document.body.innerHTML = `
+      <div id="app"></div>
+      <template id="item-template">
+        <div class="item">
+          <span class="name"></span>
+        </div>
+      </template>
+    `
     vi.spyOn(console, 'log').mockImplementation(() => {})
-  })
-
-  afterEach(() => {
-    delete global.document
   })
 
   it('creates view with element by ID', () => {
@@ -207,7 +196,7 @@ describe('View', () => {
     })
 
     const btn = view.element.querySelector('.btn')
-    btn.dispatchEvent(new dom.window.Event('click', { bubbles: true }))
+    btn.dispatchEvent(new Event('click', { bubbles: true }))
 
     expect(clicked).toBe(true)
   })
@@ -222,7 +211,7 @@ describe('View', () => {
     })
 
     const btn = view.element.querySelector('.btn')
-    btn.dispatchEvent(new dom.window.Event('click', { bubbles: true }))
+    btn.dispatchEvent(new Event('click', { bubbles: true }))
 
     expect(clicked).toBe(false)
   })
@@ -242,7 +231,7 @@ describe('View', () => {
     })
 
     const btn = view.element.querySelector('.btn')
-    btn.dispatchEvent(new dom.window.Event('click', { bubbles: true }))
+    btn.dispatchEvent(new Event('click', { bubbles: true }))
 
     expect(clicked).toBe(true)
   })
@@ -257,12 +246,12 @@ describe('View', () => {
     })
 
     const btn = view.element.querySelector('.btn')
-    btn.dispatchEvent(new dom.window.Event('click', { bubbles: true }))
+    btn.dispatchEvent(new Event('click', { bubbles: true }))
     expect(clickCount).toBe(1)
 
     view.dispose()
 
-    btn.dispatchEvent(new dom.window.Event('click', { bubbles: true }))
+    btn.dispatchEvent(new Event('click', { bubbles: true }))
     expect(clickCount).toBe(1) // no more clicks registered
   })
 
