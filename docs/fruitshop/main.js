@@ -1,4 +1,4 @@
-import { Graph } from '../../src/index.js'
+import { Graph } from '@tetsuo/signal'
 import Store from './domain/Store.js'
 import App from './views/App.js'
 

@@ -1,4 +1,4 @@
-import { View } from '../../../src/index.js'
+import { View } from '@tetsuo/signal'
 
 // Displays store analytics metrics
 export default class Analytics extends View {

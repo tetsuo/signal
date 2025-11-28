@@ -1,4 +1,4 @@
-import { View } from '../../../src/index.js'
+import { View } from '@tetsuo/signal'
 
 // Displays cart totals and checkout button
 export default class CartSummary extends View {

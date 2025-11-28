@@ -1,4 +1,4 @@
-import { View } from '../../../src/index.js'
+import { View } from '@tetsuo/signal'
 
 // Displays activity log entries
 export default class ActivityFeed extends View {

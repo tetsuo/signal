@@ -1,4 +1,4 @@
-import { View } from '../../../src/index.js'
+import { View } from '@tetsuo/signal'
 
 // Displays cart items with quantity controls
 export default class CartItemList extends View {

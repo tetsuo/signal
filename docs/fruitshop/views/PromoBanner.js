@@ -1,4 +1,4 @@
-import { View } from '../../../src/index.js'
+import { View } from '@tetsuo/signal'
 
 // Shows promotional messages based on customer spending
 export default class PromoBanner extends View {

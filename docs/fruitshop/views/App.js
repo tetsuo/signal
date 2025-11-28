@@ -1,4 +1,4 @@
-import { Observer } from '../../../src/index.js'
+import { Observer } from '@tetsuo/signal'
 import CustomerProfile from './CustomerProfile.js'
 import ProductGrid from './ProductGrid.js'
 import Cart from './Cart.js'

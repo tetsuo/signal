@@ -1,4 +1,4 @@
-import { Observer } from '../../../src/index.js'
+import { Observer } from '@tetsuo/signal'
 import PromoBanner from './PromoBanner.js'
 
 // Displays customer info and stats

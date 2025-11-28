@@ -1,4 +1,4 @@
-import { Observer } from '../../../src/index.js'
+import { Observer } from '@tetsuo/signal'
 
 // Watches for customer level transitions and logs activity
 export default class LevelUpgradeObserver extends Observer {

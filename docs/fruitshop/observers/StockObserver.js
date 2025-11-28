@@ -1,4 +1,4 @@
-import { Observer } from '../../../src/index.js'
+import { Observer } from '@tetsuo/signal'
 
 // Watches stock status
 export default class StockObserver extends Observer {

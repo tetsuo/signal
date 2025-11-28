@@ -1,4 +1,4 @@
-import { View } from '../../../src/index.js'
+import { View } from '@tetsuo/signal'
 
 // Displays all products with add-to-cart functionality
 export default class ProductGrid extends View {
