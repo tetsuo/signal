@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>signal examples</title>
+  <style>
+    :root { --gap: 12px; }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .gallery {
+      display: flex;
+      gap: var(--gap);
+      align-items: flex-start;
+    }
+
+    .gallery .item {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    @media (max-width: 960px) {
+      .gallery { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <h1><a href="https://github.com/tetsuo/signal">signal</a> examples</h1>
+
+  <div class="gallery">
+    <div class="item">
+      <h3 style="text-align: center;">fruitshop</h3>
+      <a href="https://tetsuo.github.io/signal/fruitshop"><img src="screenshot-fruitshop.png" alt="fruitshop Screenshot" /></a>
+    </div>
+    <div class="item">
+      <h3 style="text-align: center;">TodoMVC</h3>
+      <a href="https://tetsuo.github.io/signal/todomvc"><img src="screenshot-todomvc.png" alt="TodoMVC Screenshot" /></a>
+    </div>
+  </div>
+</body>
+</html>
