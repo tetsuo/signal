@@ -1,6 +1,8 @@
 # signal
 
-Tiny reactive runtime that wires up values and effects into a graph and keeps them in sync.
+Reactive dependency-tracking library for managing application state.
+
+> 👉 **[See demos](https://tetsuo.github.io/signal/)**
 
 ## Installation
 
